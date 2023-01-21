@@ -19,7 +19,7 @@
   padding: 15px 15px 6px 15px;
 }
 
-.ToDoDiv {
+.Sect1 {
   margin-bottom: 6px;
 }
 
@@ -28,7 +28,7 @@
   margin: auto;
 }
 
-.Content {
+.Sect2 {
   margin-top: 10px;
 }
 
@@ -37,6 +37,44 @@
   padding: 13px 10px 13px 6px;
   font-weight: bold;
   font-size: 14px;
+}
+
+.InputSearch {
+  width: 100%;
+  margin: 10px 0;
+  padding: 4px 6px;
+  border: solid 1px #ccc;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.InputSearch:focus {
+  border-color: aqua;
+  outline: none;
+}
+
+.Buttons {
+  width: fit-content;
+  margin-left: auto;
+  display: flex;
+}
+
+.Buttons button {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ButtonCreate {
+  background-color: #e4e4e4;
+  color: #7f7f7f;
+}
+
+.ButtonCancel {
+  background: none;
+  color: aqua;
 }
 
 .Footer {
