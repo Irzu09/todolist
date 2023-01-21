@@ -16,12 +16,27 @@
   border: solid 1px #999;
   width: 300px;
   margin: auto;
-  padding: 10px;
+  padding: 15px 15px 6px 15px;
 }
 
-.Divider{
+.ToDoDiv {
+  margin-bottom: 6px;
+}
+
+.Divider {
   border-bottom: solid 1px #999;
   margin: auto;
+}
+
+.Content {
+  margin-top: 10px;
+}
+
+.List {
+  border-bottom: solid 1px #ccc;
+  padding: 13px 10px 13px 6px;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .Footer {
