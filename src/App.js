@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 function App() {
   const [add, setAdd] = useState(false);
+  const [more, setMore] = useState(false);
 
   const list = [
     { id: 1, subject: 'Make Payment', status: false },
@@ -21,13 +22,28 @@ function App() {
         Money Match
       </header>
       <body>
-        <div className='Box shadow-sm rounded'>
+        <div className='Box'>
           <div className='d-flex justify-content-between Sect1'>
-            <span>To Do List</span>
-            <span>
-              <img src={AddIcon} className='mr-3' alt='add icon' onClick={() => setAdd(!add)} />
-              <img src={MoreIcon} className='mr-2' alt='more icon' />
-            </span>
+            <div>To Do List</div>
+            <div>
+              <div className='d-flex flex-row'>
+                <div className='d-flex'>
+                  <img src={AddIcon} className='pr-2 ' alt='add icon' onClick={() => setAdd(!add)} />
+                </div>
+                <div className='position-relative d-flex'>
+                  <img src={MoreIcon} className='pl-1 pr-2' alt='more icon' onClick={() => setMore(!more)} />
+
+                  {more &&
+                    <div className='MoreDropdownContainer'>
+                      <div className='MoreDropdown'>
+                        Delete Entire List
+                      </div>
+                    </div>
+                  }
+
+                </div>
+              </div>
+            </div>
           </div>
           <div className='Divider'></div>
           <div className='Sect2'>

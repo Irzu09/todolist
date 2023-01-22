@@ -14,9 +14,12 @@
 
 .Box {
   border: solid 1px #999;
-  width: 300px;
+  border-radius: 6px;
+  width: 345px;
   margin: auto;
   padding: 15px 15px 6px 15px;
+  box-shadow: 0 0 3px #999;
+  position: relative;
 }
 
 .Sect1 {
@@ -26,6 +29,26 @@
 .Divider {
   border-bottom: solid 1px #999;
   margin: auto;
+}
+
+.MoreDropdownContainer {
+  background-color: white;
+  border: solid 1px #999;
+  border-radius: 6px;
+  box-shadow: 0 0 6px #ccc;
+  width: 190px;
+  position: absolute;
+  right: 4px;
+  top: 27px;
+}
+
+.MoreDropdown {
+  background: url('./assets/delete.svg') no-repeat center left 15px;
+  background-size: 20px;
+  font-size: 14px;
+  color: #7f7f7f;
+  font-weight: 450;
+  padding: 14px 38px 14px 44px;
 }
 
 .Sect2 {
