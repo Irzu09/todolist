@@ -115,6 +115,7 @@
 .EditDiv:hover,
 .EditDiv:focus {
   background-color: #f0f0f0;
+  outline: none;
 }
 
 .Sect2 {
@@ -164,6 +165,7 @@
 
 .Buttons button {
   border: none;
+  outline: none;
   border-radius: 8px;
   padding: 5px 12px;
   font-size: 14px;
@@ -178,6 +180,11 @@
 .ButtonCancel {
   background: none;
   color: aqua;
+}
+
+.ButtonCreate:hover, .ButtonCancel:hover, .ButtonCreate:focus, .ButtonCancel:focus{
+  background-color: #50ffff;
+  color: #7f7f7f;
 }
 
 .Footer {

@@ -71,22 +71,23 @@ function App() {
         </div>
         <div className='Divider'></div>
         <div className='Sect2'>
-          {list.map((list, index) =>
-            <div key={list.id} className='List d-flex flex-row justify-content-between'>
+          {list.map((data, index) =>
+            <div key={data.id} className='List d-flex flex-row justify-content-between'>
               {editList[index] ?
                 <div className='EditSect'>
-                  <input className='InputSearchEdit' value={list.subject} autoFocus></input>
+                  <input type='text' className='InputSearchEdit' value={data.subject} autoFocus
+                    onChange={(e) => {
+                      const y = [...list];
+                      y[index].subject = e.target.value;
+                      setList(y);
+                    }}
+                  />
                   <div className='ButtonsEdit'>
                     <button className='EditDiv mr-2'
-                      onClick={(e) => {
+                      onClick={() => {
                         const x = [...editList];
                         x[index] = false
                         setEditList(x);
-
-                        // const y = [...list];
-                        // y[index].subject = e.target.value;
-                        // setList(y);
-
                       }}
                     ><img src={CheckIcon} /></button>
                     <button className='EditDiv'
@@ -98,7 +99,7 @@ function App() {
                     ><img src={UncheckIcon} /></button>
                   </div>
                 </div>
-                : <div>{list.subject}</div>
+                : <div>{data.subject}</div>
               }
 
               <div className='d-flex flex-row'>
@@ -125,7 +126,11 @@ function App() {
                       >
                         Edit Item
                       </div>
-                      <div className='ChildMoreDropdown' id='DeleteIcon'>
+                      <div className='ChildMoreDropdown' id='DeleteIcon'
+                        onClick={() => {
+                          // delete in db
+                        }}
+                      >
                         Delete Item
                       </div>
                     </div>
@@ -141,8 +146,12 @@ function App() {
           <div>
             <input type='search' className='InputSearch' placeholder='What needs to be done?' autoFocus />
             <div className='Buttons'>
-              <button className='mr-2 ButtonCreate'>Create</button>
-              <button className='ButtonCancel'>Cancel</button>
+              <button className='mr-2 ButtonCreate'
+                onClick={() => {
+                  // database to add
+                }}
+              >Create</button>
+              <button className='ButtonCancel' onClick={() => setAdd(false)}>Cancel</button>
             </div>
           </div>
         }
