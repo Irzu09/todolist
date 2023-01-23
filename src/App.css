@@ -12,6 +12,10 @@
   color: white;
 }
 
+.App div {
+  cursor: default;
+}
+
 .Box {
   border: solid 1px #999;
   border-radius: 6px;
@@ -40,6 +44,7 @@
   position: absolute;
   right: 4px;
   top: 27px;
+  z-index: 1;
 }
 
 .MoreDropdown {
@@ -49,6 +54,67 @@
   color: #7f7f7f;
   font-weight: 450;
   padding: 14px 38px 14px 44px;
+}
+
+.ChildMoreDropdownContainer {
+  background-color: white;
+  border: solid 1px #999;
+  border-radius: 6px;
+  box-shadow: 0 0 6px #ccc;
+  width: 150px;
+  padding: 6px;
+  position: absolute;
+  right: -6px;
+  top: 30px;
+  z-index: 1;
+}
+
+.ChildMoreDropdown {
+  font-size: 14px;
+  color: #7f7f7f;
+  font-weight: 450;
+  padding: 8px 24px 8px 36px;
+  text-align: left;
+  border-radius: 6px;
+}
+
+#EditIcon {
+  background: url('./assets/edit.svg') no-repeat center left 11px;
+  background-size: 20px;
+}
+
+#DeleteIcon {
+  background: url('./assets/delete.svg') no-repeat center left 11px;
+  background-size: 20px;
+}
+
+#EditIcon:hover {
+  background-color: #f0f0f0;
+}
+
+#DeleteIcon:hover {
+  background-color: #f0f0f0;
+}
+
+.ButtonsEdit {
+  width: fit-content;
+  position: absolute;
+  right: 0;
+  top: 36px;
+}
+
+.EditDiv {
+  line-height: 1;
+  padding: 6px;
+  border: solid 1px #f4f4f4;
+  border-radius: 4px;
+  box-shadow: 0 2px 2px #e5e5e5;
+  background-color: #f8f8f8;
+}
+
+.EditDiv:hover,
+.EditDiv:focus {
+  background-color: #f0f0f0;
 }
 
 .Sect2 {
@@ -71,9 +137,23 @@
   border-radius: 4px;
 }
 
-.InputSearch:focus {
+.InputSearchEdit {
+  width: 100%;
+  padding: 4px 6px;
+  border: solid 1.5px #ccc;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.InputSearch:focus,
+.InputSearchEdit {
   border-color: aqua;
   outline: none;
+}
+
+.EditSect {
+  width: 80%;
+  position: relative;
 }
 
 .Buttons {
@@ -105,4 +185,8 @@
   margin: 20px auto 0px;
   font-size: 10px;
   width: fit-content;
+}
+
+.Cursor-pointer {
+  cursor: pointer !important;
 }
