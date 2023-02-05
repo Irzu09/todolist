@@ -5,22 +5,22 @@ import CheckboxIcon from './assets/checkbox.svg';
 import CheckIcon from './assets/check.svg';
 import UncheckIcon from './assets/uncheck.svg';
 import { useState, useEffect, useRef } from 'react';
-
-const listContent = [
-  { id: 1, subject: 'Make Payment', status: false },
-  { id: 2, subject: 'Submit Pending Claims', status: false },
-  { id: 3, subject: 'Submit Pending Claims', status: false },
-  { id: 4, subject: 'Submit Pending Claims', status: false },
-  { id: 5, subject: 'Submit Pending Claims', status: false },
-  { id: 6, subject: 'Submit Pending Claims', status: false },
-];
+import axios from "axios";
 
 function App() {
-  const [list, setList] = useState(listContent);
+  const [list, setList] = useState([]);
   const [add, setAdd] = useState(false);
   const [more, setMore] = useState(false);
-  const [childMore, setChildMore] = useState(list.map(() => { return false }));
-  const [editList, setEditList] = useState(list.map(() => { return false }));
+
+  useEffect(() => {
+    axios.get("http://localhost:3008/").then((response) => {
+      setList(response.data);
+    });
+  }, []);
+
+  const [childMore, setChildMore] = useState(list && list.map(() => { return false }));
+  const [editList, setEditList] = useState(list && list.map(() => { return false }));
+  const [newData, setNewData] = useState("");
 
   let refMore = useRef(null);
   let refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
@@ -41,6 +41,36 @@ function App() {
     if (refMore && !refMore.current.contains(e.target)) setMore(false);
   }
 
+  const createData = () => {
+    axios.post("http://localhost:3008/", { newSubject: newData })
+      .then((response) => { setList(response.data); console.log("Added Successfully") })
+  }
+
+  const updateData = (id, subject) => {
+    axios.put("http://localhost:3008/", { id: id, subject: subject })
+      .then((response) => { setList(response.data); console.log("Updated Successfully") })
+  }
+
+  const deleteData = (id) => {
+    axios({
+      method: 'delete',
+      url: 'http://localhost:3008/',
+      data: { id: id }
+    }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
+  }
+
+  const deleteAllData = () => {
+    const x = [];
+    const id = list.map((data) => { x.push(data.id); return data.id })
+    console.log(x);
+    console.log(id);
+    axios({
+      method: 'delete',
+      url: 'http://localhost:3008/',
+      data: { id: id }
+    }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
+  }
+
   return (
     <div className='App'>
       <header className='App-header'>
@@ -59,7 +89,7 @@ function App() {
 
                 {more &&
                   <div className='MoreDropdownContainer'>
-                    <div className='MoreDropdown'>
+                    <div className='MoreDropdown' onClick={() => deleteAllData()}>
                       Delete Entire List
                     </div>
                   </div>
@@ -71,7 +101,7 @@ function App() {
         </div>
         <div className='Divider'></div>
         <div className='Sect2'>
-          {list.map((data, index) =>
+          {list && list.map((data, index) =>
             <div key={data.id} className='List d-flex flex-row justify-content-between'>
               {editList[index] ?
                 <div className='EditSect'>
@@ -88,6 +118,7 @@ function App() {
                         const x = [...editList];
                         x[index] = false
                         setEditList(x);
+                        updateData(data.id, data.subject);
                       }}
                     ><img src={CheckIcon} /></button>
                     <button className='EditDiv'
@@ -127,10 +158,7 @@ function App() {
                         Edit Item
                       </div>
                       <div className='ChildMoreDropdown' id='DeleteIcon'
-                        onClick={() => {
-                          // delete in db
-                        }}
-                      >
+                        onClick={() => deleteData(data.id)} >
                         Delete Item
                       </div>
                     </div>
@@ -144,13 +172,9 @@ function App() {
 
         {add &&
           <div>
-            <input type='search' className='InputSearch' placeholder='What needs to be done?' autoFocus />
+            <input type='text' className='InputSearch' placeholder='What needs to be done?' value={newData} autoFocus onChange={(e) => setNewData(e.target.value)} />
             <div className='Buttons'>
-              <button className='mr-2 ButtonCreate'
-                onClick={() => {
-                  // database to add
-                }}
-              >Create</button>
+              <button className='mr-2 ButtonCreate' onClick={() => { createData(); setNewData(""); }} >Create</button>
               <button className='ButtonCancel' onClick={() => setAdd(false)}>Cancel</button>
             </div>
           </div>
