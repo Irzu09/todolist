@@ -6,16 +6,44 @@ import CheckIcon from './assets/check.svg';
 import UncheckIcon from './assets/uncheck.svg';
 import { useState, useEffect, useRef } from 'react';
 import axios from "axios";
+import config from "./config.json";
 
 function App() {
+  const BASE_URL = config.baseUrl.dev;
   const [list, setList] = useState([]);
   const [add, setAdd] = useState(false);
   const [more, setMore] = useState(false);
 
+  function getData(dataItems) {
+    return new Promise((resolve, reject) => {
+      try {
+        setTimeout(() => { resolve(dataItems) }, 2000);
+      }
+      catch (error) {
+        reject(console.log(error))
+      }
+    })
+  }
+
   useEffect(() => {
-    axios.get("http://localhost:3008/").then((response) => {
-      setList(response.data);
-    });
+    // MySQL database - GET
+    // axios.get("http://localhost:3008/").then((response) => {
+    //   setList(response.data);
+    // });
+
+    // api - GET
+    fetch(`${BASE_URL}/v1/todo`)
+      .then((result) => {
+        const res = result.json();
+        getData(res).then(data => {
+          const dataTodo = data.todos;
+          const dataList = [];
+          dataTodo.map((data, index) => {
+            dataList.push({ key: index, id: data._id, subject: data.description, status: data.isCompleted });
+          })
+          setList(dataList);
+        });
+      });
   }, []);
 
   const [childMore, setChildMore] = useState(list && list.map(() => { return false }));
@@ -60,15 +88,8 @@ function App() {
   }
 
   const deleteAllData = () => {
-    const x = [];
-    const id = list.map((data) => { x.push(data.id); return data.id })
-    console.log(x);
-    console.log(id);
-    axios({
-      method: 'delete',
-      url: 'http://localhost:3008/',
-      data: { id: id }
-    }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
+    axios.delete("http://localhost:3008/deleteAll")
+      .then((response) => { setList(response.data); console.log("Updated Successfully") })
   }
 
   return (
