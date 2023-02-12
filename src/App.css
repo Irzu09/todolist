@@ -120,6 +120,7 @@
 
 .Sect2 {
   margin-top: 10px;
+  min-height: 25px;
 }
 
 .List {
@@ -129,9 +130,12 @@
   font-size: 14px;
 }
 
+.InputDiv {
+  margin: 10px 0;
+}
+
 .InputSearch {
   width: 100%;
-  margin: 10px 0;
   padding: 4px 6px;
   border: solid 1.5px #ccc;
   font-size: 14px;
@@ -150,6 +154,12 @@
 .InputSearchEdit {
   border-color: aqua;
   outline: none;
+}
+
+.Error {
+  width: fit-content;
+  font-size: 14px;
+  margin: 2px 0px 0px 4px;
 }
 
 .EditSect {
@@ -182,7 +192,10 @@
   color: aqua;
 }
 
-.ButtonCreate:hover, .ButtonCancel:hover, .ButtonCreate:focus, .ButtonCancel:focus{
+.ButtonCreate:hover,
+.ButtonCancel:hover,
+.ButtonCreate:focus,
+.ButtonCancel:focus {
   background-color: #50ffff;
   color: #7f7f7f;
 }

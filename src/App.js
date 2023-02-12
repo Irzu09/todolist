@@ -7,6 +7,7 @@ import UncheckIcon from './assets/uncheck.svg';
 import { useState, useEffect, useRef } from 'react';
 import axios from "axios";
 import config from "./config.json";
+import { format } from 'date-fns'
 
 function App() {
   const BASE_URL = config.baseUrl.dev;
@@ -14,41 +15,14 @@ function App() {
   const [add, setAdd] = useState(false);
   const [more, setMore] = useState(false);
 
-  function getData(dataItems) {
-    return new Promise((resolve, reject) => {
-      try {
-        setTimeout(() => { resolve(dataItems) }, 2000);
-      }
-      catch (error) {
-        reject(console.log(error))
-      }
-    })
-  }
-
   useEffect(() => {
-    // MySQL database - GET
-    // axios.get("http://localhost:3008/").then((response) => {
-    //   setList(response.data);
-    // });
-
-    // api - GET
-    fetch(`${BASE_URL}/v1/todo`)
-      .then((result) => {
-        const res = result.json();
-        getData(res).then(data => {
-          const dataTodo = data.todos;
-          const dataList = [];
-          dataTodo.map((data, index) => {
-            dataList.push({ key: index, id: data._id, subject: data.description, status: data.isCompleted });
-          })
-          setList(dataList);
-        });
-      });
+    fetchData();
   }, []);
 
   const [childMore, setChildMore] = useState(list && list.map(() => { return false }));
   const [editList, setEditList] = useState(list && list.map(() => { return false }));
   const [newData, setNewData] = useState("");
+  const [newDataError, setNewDataError] = useState(false);
 
   let refMore = useRef(null);
   let refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
@@ -69,27 +43,87 @@ function App() {
     if (refMore && !refMore.current.contains(e.target)) setMore(false);
   }
 
+  const fetchData = () => {
+    // MySQL database - GET
+    // axios.get("http://localhost:3008/").then((response) => {
+    //   setList(response.data);
+    // });
+
+    // api - GET
+    axios.get(`${BASE_URL}/v1/todo`)
+      .then((result) => {
+        const dataTodo = result.data.todos;
+        const dataList = [];
+        dataTodo.map((data, index) => {
+          dataList.push({ key: index, id: data._id, subject: data.description, status: data.isCompleted });
+        })
+        setList(dataList);
+      });
+  }
+
   const createData = () => {
-    axios.post("http://localhost:3008/", { newSubject: newData })
-      .then((response) => { setList(response.data); console.log("Added Successfully") })
+    // axios.post("http://localhost:3008/", { newSubject: newData })
+    //   .then((response) => { setList(response.data); console.log("Added Successfully") })
+
+    const date = format(new Date(), 'yyyy-MM-dd');
+    const time = format(new Date(), 'HH:mm:ss.SSS');
+    const fulldate = date + "T" + time + "Z";
+
+    axios.post(`${BASE_URL}/v1/todo`, {
+      title: "Write Test-Cases",
+      description: newData,
+      onDate: fulldate,
+      cardColor: "#4dd0e1"
+    })
+      .then((result) => {
+        console.log(result.data.status);
+        fetchData();
+      });
   }
 
   const updateData = (id, subject) => {
-    axios.put("http://localhost:3008/", { id: id, subject: subject })
-      .then((response) => { setList(response.data); console.log("Updated Successfully") })
+    // axios.put("http://localhost:3008/", { id: id, subject: subject })
+    //   .then((response) => { setList(response.data); console.log("Updated Successfully") })
+
+    axios.put(`${BASE_URL}/v1/todo/${id}`, {
+      title: "Updated Title 2",
+      description: subject,
+    })
+      .then((result) => {
+        console.log(result.data.status);
+        fetchData();
+      });
   }
 
   const deleteData = (id) => {
-    axios({
-      method: 'delete',
-      url: 'http://localhost:3008/',
-      data: { id: id }
-    }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
+    // axios({
+    //   method: 'delete',
+    //   url: 'http://localhost:3008/',
+    //   data: { id: id }
+    // }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
+
+    axios.delete(`${BASE_URL}/v1/todo/${id}`)
+      .then((result) => {
+        console.log(result.data.status);
+        fetchData();
+      });
   }
 
   const deleteAllData = () => {
-    axios.delete("http://localhost:3008/deleteAll")
-      .then((response) => { setList(response.data); console.log("Updated Successfully") })
+    // axios.delete("http://localhost:3008/deleteAll")
+    //   .then((response) => { setList(response.data); console.log("Deleted Successfully") })
+
+    const listLength = list.length;
+    list.map((data, index) => {
+      axios.delete(`${BASE_URL}/v1/todo/${data.id}`)
+        .then((result) => {
+          if (result.data.status === "Error") console.log(data.subject + "fail to delete");
+          if (listLength === index - 1) {
+            console.log(result.data.status);
+            fetchData();
+          }
+        });
+    })
   }
 
   return (
@@ -110,7 +144,7 @@ function App() {
 
                 {more &&
                   <div className='MoreDropdownContainer'>
-                    <div className='MoreDropdown' onClick={() => deleteAllData()}>
+                    <div className='MoreDropdown Cursor-pointer' onClick={() => deleteAllData()}>
                       Delete Entire List
                     </div>
                   </div>
@@ -193,9 +227,29 @@ function App() {
 
         {add &&
           <div>
-            <input type='text' className='InputSearch' placeholder='What needs to be done?' value={newData} autoFocus onChange={(e) => setNewData(e.target.value)} />
+            <div className='InputDiv'>
+              <input type='text' className='InputSearch' placeholder='What needs to be done?' value={newData} autoFocus
+                onChange={(e) => {
+                  setNewData(e.target.value);
+                  if (e.target.value === "") setNewDataError(true)
+                  else setNewDataError(false)
+                }}
+              />
+              {newDataError && <div className='text-danger Error'>This field cannot be empty</div>}
+            </div>
             <div className='Buttons'>
-              <button className='mr-2 ButtonCreate' onClick={() => { createData(); setNewData(""); }} >Create</button>
+              <button className='mr-2 ButtonCreate'
+                onClick={() => {
+                  setNewDataError(false);
+
+                  if (newData !== "") {
+                    createData();
+                    setNewData("");
+                    setAdd(false);
+                  }
+                  else setNewDataError(true);
+                }}
+              >Create</button>
               <button className='ButtonCancel' onClick={() => setAdd(false)}>Cancel</button>
             </div>
           </div>
@@ -203,7 +257,7 @@ function App() {
 
         <div className='Footer'>Don't miss out an importance tasks anymore</div>
       </div>
-    </div >
+    </div>
   );
 }
 
