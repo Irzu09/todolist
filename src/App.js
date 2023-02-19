@@ -23,107 +23,44 @@ function App() {
   const [editList, setEditList] = useState(list && list.map(() => { return false }));
   const [newData, setNewData] = useState("");
   const [newDataError, setNewDataError] = useState(false);
-
-  let refMore = useRef(null);
-  let refs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
-
-  // useEffect(() => {
-  //   document.addEventListener("click", handleClickOutside, true)
-  //   document.removeEventListener("click", handleClickOutside, true)
-  // }, []);
-
-  const handleClickOutside = (e) => {
-    refs.filter((refs, index) => {
-      if (refs.current && !refs.current.contains(e.target)) {
-        const x = [...childMore];
-        x[index] = false;
-        setChildMore(x);
-      }
-    })
-    if (refMore && !refMore.current.contains(e.target)) setMore(false);
-  }
+  const [editDataError, setEditDataError] = useState(false);
 
   const fetchData = () => {
     // MySQL database - GET
-    // axios.get("http://localhost:3008/").then((response) => {
-    //   setList(response.data);
-    // });
-
-    // api - GET
-    axios.get(`${BASE_URL}/v1/todo`)
-      .then((result) => {
-        const dataTodo = result.data.todos;
-        const dataList = [];
-        dataTodo.map((data, index) => {
-          dataList.push({ key: index, id: data._id, subject: data.description, status: data.isCompleted });
-        })
-        setList(dataList);
-      });
+    axios.get(`${BASE_URL}`).then((response) => {
+      setList(response.data);
+    });
   }
 
   const createData = () => {
-    // axios.post("http://localhost:3008/", { newSubject: newData })
-    //   .then((response) => { setList(response.data); console.log("Added Successfully") })
-
-    const date = format(new Date(), 'yyyy-MM-dd');
-    const time = format(new Date(), 'HH:mm:ss.SSS');
-    const fulldate = date + "T" + time + "Z";
-
-    axios.post(`${BASE_URL}/v1/todo`, {
-      title: "Write Test-Cases",
-      description: newData,
-      onDate: fulldate,
-      cardColor: "#4dd0e1"
-    })
-      .then((result) => {
-        console.log(result.data.status);
-        fetchData();
-      });
+    axios.post(`${BASE_URL}`, { newSubject: newData })
+      .then((response) => { setList(response.data); console.log("Added Successfully") })
   }
 
   const updateData = (id, subject) => {
-    // axios.put("http://localhost:3008/", { id: id, subject: subject })
-    //   .then((response) => { setList(response.data); console.log("Updated Successfully") })
-
-    axios.put(`${BASE_URL}/v1/todo/${id}`, {
-      title: "Updated Title 2",
-      description: subject,
-    })
-      .then((result) => {
-        console.log(result.data.status);
-        fetchData();
-      });
+    axios.put(`${BASE_URL}`, { id: id, subject: subject })
+      .then((response) => { setList(response.data); console.log("Updated Successfully") })
   }
 
   const deleteData = (id) => {
-    // axios({
-    //   method: 'delete',
-    //   url: 'http://localhost:3008/',
-    //   data: { id: id }
-    // }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
-
-    axios.delete(`${BASE_URL}/v1/todo/${id}`)
-      .then((result) => {
-        console.log(result.data.status);
-        fetchData();
-      });
+    axios({
+      method: 'delete',
+      url: `${BASE_URL}`,
+      data: { id: id }
+    }).then((response) => { setList(response.data); console.log("Deleted Succesfully"); })
   }
 
   const deleteAllData = () => {
-    // axios.delete("http://localhost:3008/deleteAll")
-    //   .then((response) => { setList(response.data); console.log("Deleted Successfully") })
+    axios.delete(`${BASE_URL}/deleteAll`)
+      .then((response) => { setList(response.data); console.log("Deleted Successfully") })
+  }
 
-    const listLength = list.length;
-    list.map((data, index) => {
-      axios.delete(`${BASE_URL}/v1/todo/${data.id}`)
-        .then((result) => {
-          if (result.data.status === "Error") console.log(data.subject + "fail to delete");
-          if (listLength === index - 1) {
-            console.log(result.data.status);
-            fetchData();
-          }
-        });
-    })
+  const completeToDo = (id) => {
+    // axios.patch(`${BASE_URL}/v1/todo/${id}`)
+    //   .then((result) => {
+    //     console.log(result.data.message);
+    //     fetchData();
+    //   });
   }
 
   return (
@@ -137,10 +74,18 @@ function App() {
           <div>
             <div className='d-flex flex-row'>
               <div className='d-flex Cursor-pointer'>
-                <img src={AddIcon} className='pr-2' alt='add icon' onClick={() => setAdd(!add)} />
+                <img src={AddIcon} className='pr-2' alt='add icon'
+                  onClick={() => {
+                    setAdd(!add);
+
+                    // close edit input bar
+                    const x = editList.map(() => { return false })
+                    setEditList(x);
+                  }}
+                />
               </div>
-              <div className='position-relative d-flex Cursor-pointer'>
-                <img src={MoreIcon} className='pl-1 pr-2' alt='more icon' ref={refMore} onClick={() => setMore(!more)} />
+              <div className='position-relative d-flex Cursor-pointer' onMouseEnter={() => setMore(!more)} onMouseLeave={() => setMore(!more)} >
+                <img src={MoreIcon} className='pl-1 pr-2' alt='more icon' />
 
                 {more &&
                   <div className='MoreDropdownContainer'>
@@ -162,18 +107,41 @@ function App() {
                 <div className='EditSect'>
                   <input type='text' className='InputSearchEdit' value={data.subject} autoFocus
                     onChange={(e) => {
-                      const y = [...list];
-                      y[index].subject = e.target.value;
-                      setList(y);
+                      if (e.target.value === "") setEditDataError(true);
+                      else {
+                        setEditDataError(false);
+                        const y = [...list];
+                        y[index].subject = e.target.value;
+                        setList(y);
+                      }
+                    }}
+                    onKeyUp={(e) => {
+                      if (e.key === "Enter") {
+                        setEditDataError(false);
+
+                        if (e.target.value !== "") {
+                          const x = [...editList];
+                          x[index] = false
+                          setEditList(x);
+                          updateData(data.id, data.subject);
+                        }
+                        else setEditDataError(true);
+                      }
                     }}
                   />
+                  {editDataError && <div className='text-danger font-weight-normal Error'>This field cannot be empty</div>}
                   <div className='ButtonsEdit'>
                     <button className='EditDiv mr-2'
                       onClick={() => {
-                        const x = [...editList];
-                        x[index] = false
-                        setEditList(x);
-                        updateData(data.id, data.subject);
+                        setEditDataError(false);
+
+                        if (data.subject !== "") {
+                          const x = [...editList];
+                          x[index] = false
+                          setEditList(x);
+                          updateData(data.id, data.subject);
+                        }
+                        else setEditDataError(true);
                       }}
                     ><img src={CheckIcon} /></button>
                     <button className='EditDiv'
@@ -181,6 +149,7 @@ function App() {
                         const x = [...editList];
                         x[index] = false
                         setEditList(x);
+                        fetchData();
                       }}
                     ><img src={UncheckIcon} /></button>
                   </div>
@@ -190,24 +159,49 @@ function App() {
 
               <div className='d-flex flex-row'>
                 <div className='Cursor-pointer'>
-                  <img src={CheckboxIcon} alt='checkbox icons' />
-                </div>
-                <div className='position-relative Cursor-pointer'>
-                  <img src={MoreIcon} className='pr-1 pl-2' alt='more icon' ref={refs[index]}
-                    onClick={() => {
-                      const x = [...childMore];
-                      x[index] = !childMore[index];
-                      setChildMore(x);
+                  <input
+                    className="Checkbox"
+                    type="checkbox"
+                    id="input01"
+                    name="input01"
+                    value={data.id}
+                    checked={data.status}
+                    onChange={(e) => {
+                      const x = [...list];
+                      // once clicked, considered settle
+                      x.map((x) => { if (x.id === e.target.value) x.status = true });
+                      setList(x);
+                      completeToDo(data.id);
                     }}
                   />
+                  <span className="Checkmark"></span>
+                  {/* <img src={CheckboxIcon} alt='checkbox icons' /> */}
+                </div>
+                <div className='position-relative Cursor-pointer'
+                  onMouseEnter={() => {
+                    const x = [...childMore];
+                    x[index] = !childMore[index];
+                    setChildMore(x);
+                  }}
+                  onMouseLeave={() => {
+                    const x = [...childMore];
+                    x[index] = !childMore[index];
+                    setChildMore(x);
+                  }}
+                >
+                  <img src={MoreIcon} className='pr-1 pl-2' alt='more icon' />
 
                   {childMore[index] &&
                     <div className='ChildMoreDropdownContainer'>
                       <div className='ChildMoreDropdown' id='EditIcon'
                         onClick={() => {
-                          const x = [...editList];
-                          x[index] = !editList[index];
+                          const x = list.map((list, idx) => {
+                            if (index === idx) return true;
+                            else return false;
+                          });
                           setEditList(x);
+                          // close add input bar
+                          setAdd(false);
                         }}
                       >
                         Edit Item
@@ -233,6 +227,18 @@ function App() {
                   setNewData(e.target.value);
                   if (e.target.value === "") setNewDataError(true)
                   else setNewDataError(false)
+                }}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    setNewDataError(false);
+
+                    if (newData !== "") {
+                      createData();
+                      setNewData("");
+                      setAdd(false);
+                    }
+                    else setNewDataError(true);
+                  }
                 }}
               />
               {newDataError && <div className='text-danger Error'>This field cannot be empty</div>}

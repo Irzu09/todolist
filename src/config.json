@@ -1,5 +1,5 @@
 {    
     "baseUrl": {
-        "dev": "https://demo-todo.moneymatch.technology:8444/api"
+        "dev": "http://localhost:3008"  
     }
 }
