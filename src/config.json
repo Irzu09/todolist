@@ -1,0 +1,5 @@
+{    
+    "baseUrl": {
+        "dev": "http://localhost:3008"  
+    }
+}
